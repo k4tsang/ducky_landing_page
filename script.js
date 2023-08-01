@@ -6,57 +6,36 @@ function showConfirmationStep(email, occupation) {
   // Show the confirmation message
   let confirmationMessage = document.createElement('p');
   confirmationMessage.textContent = `Thank you for joining the waitlist!
-  We will reach out with our beta shortly.`;
+  You'll be in our beta shortly.`;
   document.querySelector('.form-wrapper').appendChild(confirmationMessage);
 }
 
-// Function to add the user to the database (you should implement this function for your specific database)
 function addUserToDatabase(email, occupation) {
-  const firebaseConfig = {
-    apiKey: "AIzaSyDO2AC2OGSERkZ33iWQVJzzPyK6M6GVp5k",
-    authDomain: "ducky-498d0.firebaseapp.com",
-    projectId: "ducky-498d0",
-    storageBucket: "ducky-498d0.appspot.com",
-    messagingSenderId: "617947101958",
-    appId: "1:617947101958:web:47edf9b3b047b15d853c87",
-    measurementId: "G-ZQCQZTLY3C",
-  };
+  // Replace 'YOUR_FIREBASE_CLOUD_FUNCTION_URL' with the URL of your deployed Firebase Cloud Function
+  const cloudFunctionURL = 'https://us-central1-ducky-498d0.cloudfunctions.net/api';
 
-  firebase.initializeApp(firebaseConfig);
-
-  // Reference to the "users" collection in Firestore
-  const usersCollection = firebase.firestore().collection('users');
-
-  let data = {
-    email: email,
-    occupation: occupation
-  };
-
-  // Add the data to the "users" collection in Firestore
-  usersCollection.add(data)
-    .then((docRef) => {
-      console.log('Document written with ID:', docRef.id);
-      // Add any success handling here if needed
+  // Make a POST request to the Firebase Cloud Function
+  fetch(cloudFunctionURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email, occupation })
+  })
+    .then((response) => {
+      if (response.ok) {
+        console.log('User added to the database successfully.');
+        // Handle success if needed
+      } else {
+        console.error('Failed to add user to the database.');
+        // Handle error if needed
+      }
     })
     .catch((error) => {
-      console.error('Error adding document:', error);
-      // Add error handling here if needed
+      console.error('Error:', error);
+      // Handle error if needed
     });
 }
-
-// Add the event listener outside the function
-document.getElementById('signup-form').addEventListener('submit', function (event) {
-  event.preventDefault();
-
-  let email = document.getElementById('email').value;
-  let occupation = document.getElementById('occupation').value;
-
-  // Show the confirmation step after the form submission
-  showConfirmationStep(email, occupation);
-
-  // Add the user to the database
-  addUserToDatabase(email, occupation);
-});
 
 // Typing animation in header
 
